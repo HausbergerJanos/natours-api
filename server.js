@@ -11,24 +11,8 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD,
 );
 
-async function xx() {
-  const tourSchema = new mongoose.Schema({
-    name: String,
-    price: Number,
-    rating: Number,
-  });
-
-  const Tour = mongoose.model('tour', tourSchema);
-  const tours = await Tour.find();
-
-  console.log(tours);
-}
-
-mongoose.connect(DB).then((con) => {
-  console.log(con.connections);
-  console.log('DB connection successful!');
-
-  xx();
+mongoose.connect(DB).then(() => {
+  console.log('DB connection estabilished!');
 });
 
 const port = process.env.PORT || 3000;
