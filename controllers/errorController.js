@@ -6,7 +6,9 @@ const handleDBCastError = (err) => {
 };
 
 const handleDBDuplicatedFields = (err) => {
-  const value = err.keyValue.name;
+  const match = err.message.match(/"([^"]+)"/);
+  const value = match ? match[1] : null;
+
   const message = `Duplicate field value: "${value}". Please use another value`;
   return new AppError(message, 400);
 };
@@ -61,6 +63,9 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    error.message = err.message;
+    console.log(err);
+    console.log(error);
 
     if (err.name === 'CastError') error = handleDBCastError(error);
     if (err.code === 11000) error = handleDBDuplicatedFields(error);
