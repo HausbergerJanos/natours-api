@@ -54,6 +54,14 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', async function (next) {
+  // Only run this function if password was actually modified and it is not new
+  if (!this.isModified('password') || this.isNew) return next();
+  // Set the password changed date
+  this.passwordChangedAt = Date.now() - 1000; // Just to ensure: token created after password changed
+  next();
+});
+
 userSchema.methods.isCorrectPassword = async function (
   candidatePassword,
   userPassword,
@@ -84,8 +92,6 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest('hex');
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-  console.log({ resetToken }, this.passwordResetToken);
 
   return resetToken;
 };
