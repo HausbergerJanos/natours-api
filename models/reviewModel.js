@@ -4,11 +4,11 @@ const reviewSchema = new mongoose.Schema(
   {
     review: {
       type: String,
-      require: [true, 'Review can not be empty!'],
+      required: [true, 'Review can not be empty!'],
     },
     rating: {
       type: Number,
-      require: [true, 'A review most have a rating!'],
+      required: [true, 'A review most have a rating!'],
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be belove 5.0'],
     },
@@ -16,12 +16,12 @@ const reviewSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      require: [true, 'A review must belong to a user!'],
+      required: [true, 'A review must belong to a user!'],
     },
     tour: {
       type: mongoose.Schema.ObjectId,
       ref: 'Tour',
-      require: [true, 'A review must belong to a tour!'],
+      required: [true, 'A review must belong to a tour!'],
     },
   },
   {
