@@ -66,20 +66,42 @@ reviewSchema.statics.calculateAverageRatings = async function (tourId) {
       },
     },
   ]);
-  console.log(stats);
+  // console.log(stats);
 
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
 };
 
 reviewSchema.post('save', function () {
-  // this points to current review
+  // this points to current review document
   // Review.calculateAverageRatings(this.tour); - Not possible, bc Review here not exists.
   // We can not put this method after Review creation, bc reviewSchema will not containst
   // this middleware
   this.constructor.calculateAverageRatings(this.tour);
+});
+
+// findByIdAndUpdate (findOneAnd)
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  // this points to current query
+  // we can save something in pre hook, which will be available in post hook
+  this.document = await this.model.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function (doc) {
+  // this points to current query
+  // this.document - awailable here
+  await doc.constructor.calculateAverageRatings(doc.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
